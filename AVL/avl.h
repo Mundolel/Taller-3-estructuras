@@ -1,26 +1,29 @@
-#ifndef AVL_H
-#define AVL_H
+#ifndef ARBOLAVL_H
+#define ARBOLAVL_H
 
 #include <list>
+using namespace std;
 
-class AVL {
+
+template<typename T>
+class arbolAVL {
 public:
-    AVL();
-    ~AVL();
+    arbolAVL();
+    ~arbolAVL();
 
-    bool insertar(int clave);
-    bool eliminar(int clave);
-    bool contiene(int clave) const;
-    void inorden(std::list<int>& salida) const;
+    bool insert(const T& clave);
+    bool erase(const T& clave);
+    bool contiene(const T& clave) const;
+    void inordenEnLista(list<T>& salida) const;
     void limpiar();
 
 private:
     struct Nodo {
-        int clave;
+        T clave;
         int altura;
         Nodo* izq;
         Nodo* der;
-        Nodo(int c) : clave(c), altura(1), izq(NULL), der(NULL) {}
+        Nodo(const T& c) : clave(c), altura(1), izq(NULL), der(NULL) {}
     };
 
     Nodo* raiz;
@@ -30,15 +33,17 @@ private:
     int factorBalance(Nodo* actual) const;
     void actualizarAltura(Nodo* actual);
 
-    Nodo* rotacionDerecha(Nodo* y);
-    Nodo* rotacionIzquierda(Nodo* x);
+    typename arbolAVL<T>::Nodo* rotacionDerecha(Nodo* y);
+    typename arbolAVL<T>::Nodo* rotacionIzquierda(Nodo* x);
 
-    bool contieneRec(Nodo* actual, int clave) const;
-    void inordenRec(Nodo* actual, std::list<int>& salida) const;
+    bool contieneRec(Nodo* actual, const T& clave) const;
+    void inordenRec(Nodo* actual, list<T>& salida) const;
 
-    Nodo* insertarRec(Nodo* actual, int clave, bool& cambiado);
-    Nodo* eliminarRec(Nodo* actual, int clave, bool& cambiado);
-    Nodo* nodoMinimo(Nodo* actual) const;
+    typename arbolAVL<T>::Nodo* insertarRec(Nodo* actual, const T& clave, bool& cambiado);
+    typename arbolAVL<T>::Nodo* eliminarRec(Nodo* actual, const T& clave, bool& cambiado);
+    typename arbolAVL<T>::Nodo* nodoMinimo(Nodo* actual) const;
 };
+
+#include "arbolAVL.hxx" 
 
 #endif

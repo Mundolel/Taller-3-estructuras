@@ -1,17 +1,24 @@
-#include "avl.h"
+#ifndef ARBOLAVL_HXX
+#define ARBOLAVL_HXX
+
+#include "arbolAVL.h"
 using namespace std;
 
-AVL::AVL() : raiz(NULL) {}
-AVL::~AVL() { limpiar(); }
+template<typename T>
+arbolAVL<T>::arbolAVL() : raiz(NULL) {}
+template<typename T>
+arbolAVL<T>::~arbolAVL() { limpiar(); }
 
 // Limpiamos todo el árbol
-void AVL::limpiar() {
+template<typename T>
+void arbolAVL<T>::limpiar() {
     limpiarRec(raiz);
     raiz = NULL;
 }
 
 // Recorremos y liberamos nodos
-void AVL::limpiarRec(Nodo* actual) {
+template<typename T>
+void arbolAVL<T>::limpiarRec(Nodo* actual) {
     if (actual == NULL) return;
     limpiarRec(actual->izq);
     limpiarRec(actual->der);
@@ -19,27 +26,36 @@ void AVL::limpiarRec(Nodo* actual) {
 }
 
 // Obtenemos la altura de un nodo
-int AVL::alturaDe(Nodo* actual) const {
+template<typename T>
+int arbolAVL<T>::alturaDe(Nodo* actual) const {
     if (actual == NULL) return 0;
     return actual->altura;
 }
 
 // Actualizamos la altura después de insertar o eliminar
-void AVL::actualizarAltura(Nodo* actual) {
+template<typename T>
+void arbolAVL<T>::actualizarAltura(Nodo* actual) {
     if (actual == NULL) return;
     int hIzq = alturaDe(actual->izq);
     int hDer = alturaDe(actual->der);
-    actual->altura = (hIzq > hDer ? hIzq : hDer) + 1;
+    if (hIzq > hDer){
+        actual->altura = hIzq + 1;
+    }
+    else{
+        actual->altura = hDer + 1;
+    }
 }
 
 // Calculamos el factor de balance
-int AVL::factorBalance(Nodo* actual) const {
+template<typename T>
+int arbolAVL<T>::factorBalance(Nodo* actual) const {
     if (actual == NULL) return 0;
     return alturaDe(actual->izq) - alturaDe(actual->der);
 }
 
+template<typename T>
 // Realizamos una rotación simple a la derecha
-AVL::Nodo* AVL::rotacionDerecha(Nodo* y) {
+typename arbolAVL<T>::Nodo* arbolAVL<T>::rotacionDerecha(Nodo* y) {
     Nodo* x = y->izq;
     Nodo* T2 = x->der;
 
@@ -53,7 +69,8 @@ AVL::Nodo* AVL::rotacionDerecha(Nodo* y) {
 }
 
 // Realizamos una rotación simple a la izquierda
-AVL::Nodo* AVL::rotacionIzquierda(Nodo* x) {
+template<typename T>
+typename arbolAVL<T>::Nodo* arbolAVL<T>::rotacionIzquierda(Nodo* x) {
     Nodo* y = x->der;
     Nodo* T2 = y->izq;
 
@@ -67,13 +84,15 @@ AVL::Nodo* AVL::rotacionIzquierda(Nodo* x) {
 }
 
 // Insertamos una clave en el AVL y balanceamos si es necesario
-bool AVL::insertar(int clave) {
+template<typename T>
+bool arbolAVL<T>::insert(const T& clave) {
     bool cambiado = false;
     raiz = insertarRec(raiz, clave, cambiado);
     return cambiado;
 }
 
-AVL::Nodo* AVL::insertarRec(Nodo* actual, int clave, bool& cambiado) {
+template<typename T>
+typename arbolAVL<T>::Nodo* arbolAVL<T>::insertarRec(Nodo* actual, const T& clave, bool& cambiado) {
     if (actual == NULL) {
         cambiado = true;
         return new Nodo(clave);
@@ -105,11 +124,13 @@ AVL::Nodo* AVL::insertarRec(Nodo* actual, int clave, bool& cambiado) {
 }
 
 // Verificamos si una clave está en el árbol
-bool AVL::contiene(int clave) const {
+template<typename T>
+bool arbolAVL<T>::contiene(const T& clave) const {
     return contieneRec(raiz, clave);
 }
 
-bool AVL::contieneRec(Nodo* actual, int clave) const {
+template<typename T>
+bool arbolAVL<T>::contieneRec(Nodo* actual, const T& clave) const {
     if (actual == NULL) return false;
     if (clave < actual->clave) return contieneRec(actual->izq, clave);
     if (clave > actual->clave) return contieneRec(actual->der, clave);
@@ -117,20 +138,23 @@ bool AVL::contieneRec(Nodo* actual, int clave) const {
 }
 
 // Buscamos el nodo mínimo
-AVL::Nodo* AVL::nodoMinimo(Nodo* actual) const {
+template<typename T>
+typename arbolAVL<T>::Nodo* arbolAVL<T>::nodoMinimo(Nodo* actual) const {
     Nodo* p = actual;
     while (p != NULL && p->izq != NULL) p = p->izq;
     return p;
 }
 
 // Eliminamos una clave y balanceamos si es necesario
-bool AVL::eliminar(int clave) {
+template<typename T>
+bool arbolAVL<T>::erase(const T& clave) {
     bool cambiado = false;
     raiz = eliminarRec(raiz, clave, cambiado);
     return cambiado;
 }
 
-AVL::Nodo* AVL::eliminarRec(Nodo* actual, int clave, bool& cambiado) {
+template<typename T>
+typename arbolAVL<T>::Nodo* arbolAVL<T>::eliminarRec(Nodo* actual, const T& clave, bool& cambiado) {
     if (actual == NULL) {
         cambiado = false;
         return actual;
@@ -179,14 +203,18 @@ AVL::Nodo* AVL::eliminarRec(Nodo* actual, int clave, bool& cambiado) {
 }
 
 // Recorremos en inorden y guardamos las claves
-void AVL::inorden(list<int>& salida) const {
+template<typename T>
+void arbolAVL<T>::inordenEnLista(list<T>& salida) const {
     salida.clear();
     inordenRec(raiz, salida);
 }
 
-void AVL::inordenRec(Nodo* actual, list<int>& salida) const {
+template<typename T>
+void arbolAVL<T>::inordenRec(Nodo* actual, list<T>& salida) const {
     if (actual == NULL) return;
     inordenRec(actual->izq, salida);
     salida.push_back(actual->clave);
     inordenRec(actual->der, salida);
 }
+
+#endif 
